@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Сталинский Удар | WW2-RP</title>
+    <style>
+        @font-face {
+            font-family: 'Ebbe';
+            src: url('xui.ttf') format('truetype');
+        }
+        
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            font-family: 'Ebbe', sans-serif;
+            color: rgb(211, 211, 211);
+        }
+        
+        .background {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-size: cover;
+            background-position: center;
+            opacity: 0;
+            transition: opacity 2s ease-in-out;
+            z-index: -2;
+        }
+        
+        .background.active {
+            opacity: 1;
+        }
+        
+        .overlay {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: -1;
+        }
+        
+        .title {
+            position: absolute;
+            top: 45%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 48px;
+            opacity: 0;
+            animation: fadeIn 2s ease-in-out forwards;
+            animation-delay: 1s;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+        
+        .loading {
+            position: absolute;
+            top: 52%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 24px;
+            opacity: 0;
+            animation: fadeIn 1s ease-in-out forwards;
+            animation-delay: 2s;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+        
+        .quote {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            max-width: 600px;
+            font-size: 16px;
+            opacity: 0;
+            animation: fadeIn 2s ease-in-out forwards;
+            animation-delay: 3s;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+            line-height: 1.4;
+        }
+        
+        .quote-author {
+            display: block;
+            margin-top: 5px;
+            padding-left: 20px;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <div class="overlay"></div>
+    
+    <div class="background" id="bg1"></div>
+    <div class="background" id="bg2"></div>
+    
+    <div class="title">Сталинский Удар | WW2-RP</div>
+    <div class="loading" id="loading-text">Загрузка.</div>
+    
+    <div class="quote" id="quote">
+        <span id="quote-text">'Кто с мечом к нам придет, тот от меча и погибнет. На том стоит и стоять будет Русская земля.'</span>
+        <span class="quote-author" id="quote-author">- Александр Невский</span>
+    </div>
+
+    <script>
+        // Background images (replace with your actual image paths)
+        const backgrounds = [
+            "govno.png",
+            "govno2.png"
+        ];
+        
+        // Quotes array
+        const quotes = [
+            {
+                text: "'Великая цель требует великой энергии.'",
+                author: "- Владимир Ленин"
+            },
+            {
+                text: "'Кадры решают всё.'",
+                author: "- Иосиф Сталин"
+            },
+            {
+                text: "'Делать по-настоящему — значит делать быстро и хорошо.'",
+                author: "- Михаил Фрунзе"
+            },
+            {
+                text: "'Тяжело в учении — легко в бою.'",
+                author: "- Александр Суворов"
+            },
+            {
+                text: "'Кто не рискует, тот не пьет шампанское.'",
+                author: "- Георгий Жуков"
+            },
+            {
+                text: "'Война — это не просто парад в мундирах. Война — это тяжелый, кровавый труд.'",
+                author: "- Константин Рокоссовский"
+            },
+            {
+                text: "'Мы должны строить будущее не только на любви к прошлому.'",
+                author: "- Никита Хрущёв"
+            },
+            {
+                text: "'Умом Россию не понять, аршином общим не измерить.'",
+                author: "- Фёдор Тютчев"
+            },
+            {
+                text: "'Победа не приходит сама — её куют солдаты, офицеры и полководцы единым порывом.'",
+                author: "- Иван Конев"
+            },
+            {
+                text: "'Лучшее средство для укрепления памяти — учить наизусть.'",
+                author: "- Семён Будённый"
+            },
+            {
+                text: "'Там, где смелость и решительность, там и победа.'",
+                author: "- Василий Чапаев"
+            },
+            {
+                text: "'Самое главное в бою — это выдержка и хладнокровие.'",
+                author: "- Климент Ворошилов"
+            },
+            {
+                text: "'Инициатива наказуема, но она же и награждаема.'",
+                author: "- Леонид Брежнев"
+            },
+            {
+                text: "'Честь солдата — быть первым в бою и последним в жалобах.'",
+                author: "- Михаил Тухачевский"
+            },
+            {
+                text: "'Слабость характера — единственный недостаток, который нельзя исправить.'",
+                author: "- Юрий Андропов"
+            },
+            {
+                text: "'Ни шагу назад! Стоять насмерть!'",
+                author: "- Василий Чуйков"
+            },
+            {
+                text: "'Танки не боятся грязи, а люди должны не бояться трудностей.'",
+                author: "- Павел Рыбалко"
+            },
+            {
+                text: "'Лётчик начинается на земле, а побеждает в небе.'",
+                author: "- Александр Покрышкин"
+            },
+            {
+                text: "'Перестройка — это не самоцель, а средство вывести страну на новый уровень.'",
+                author: "- Михаил Горбачёв"
+            }
+        ];
+        
+        // Initialize background images
+        const bg1 = document.getElementById('bg1');
+        const bg2 = document.getElementById('bg2');
+        
+        bg1.style.backgroundImage = `url('${backgrounds[0]}')`;
+        bg2.style.backgroundImage = `url('${backgrounds[1]}')`;
+        
+        bg1.classList.add('active');
+        
+        // Background rotation
+        let currentBg = 0;
+        setInterval(() => {
+            currentBg = (currentBg + 1) % backgrounds.length;
+            const nextBg = (currentBg + 1) % backgrounds.length;
+            
+            const activeBg = document.getElementById(`bg${currentBg % 2 + 1}`);
+            const nextActiveBg = document.getElementById(`bg${(currentBg + 1) % 2 + 1}`);
+            
+            nextActiveBg.style.backgroundImage = `url('${backgrounds[nextBg]}')`;
+            
+            setTimeout(() => {
+                activeBg.classList.remove('active');
+                nextActiveBg.classList.add('active');
+            }, 2000);
+            
+        }, 20000); // 20 seconds interval
+        
+        // Loading dots animation
+        const loadingText = document.getElementById('loading-text');
+        let dots = 0;
+        setInterval(() => {
+            dots = (dots + 1) % 4;
+            loadingText.textContent = 'Загрузка' + '.'.repeat(dots);
+        }, 500); // Change every 0.5 seconds for smooth animation
+        
+        // Quote rotation
+        let currentQuote = 0;
+        setInterval(() => {
+            currentQuote = (currentQuote + 1) % quotes.length;
+            
+            const quoteElement = document.getElementById('quote');
+            const quoteText = document.getElementById('quote-text');
+            const quoteAuthor = document.getElementById('quote-author');
+            
+            // Fade out
+            quoteElement.style.opacity = '0';
+            
+            setTimeout(() => {
+                // Change text
+                quoteText.textContent = quotes[currentQuote].text;
+                quoteAuthor.textContent = quotes[currentQuote].author;
+                
+                // Fade in
+                quoteElement.style.opacity = '1';
+            }, 1000); // 1 second fade out duration
+            
+        }, 10000); // 10 seconds interval
+    </script>
+</body>
+</html>
